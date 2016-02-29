@@ -1,4 +1,2 @@
-sinatra-bootstrap-clean
-=======================
-
-Cleaned version of https://github.com/bootstrap-ruby/sinatra-bootstrap
+1. На странице /new спрашивать имя автора и сохранять в БД, выводить на главной
+2. валидация комментария, если введен пустой текст - выдавать ошибку

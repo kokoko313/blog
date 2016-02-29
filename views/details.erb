@@ -10,10 +10,10 @@
 
 	<% @comments.each do |post| %>
 		<p>
-			<h2><%= post['content'] %></h2>
+			<%= post['content'] %>
 			<br/>
 			
-			Added at <%= post['created_date'] %>
+			<span style="font-size: 75%;color: gray">Added at <%= post['created_date'] %></span>
 			
 		</p>
 		<hr/>

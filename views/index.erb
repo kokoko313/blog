@@ -1,13 +1,14 @@
 <h1>Fresh posts for today!</h1>
 
-	<% @results.each do |post| %>
+	<% @posts.each do |post| %>
 		<p>
-			<h2><%= post['content'] %></h2>
+			<h2><%= post.content %></h2>
 			<br/>
 			
-			Added at <%= post['created_date'] %>
+			Added at <%= post.created_date %>
+			Username <%= post.username %>
 			<br/>
-			<a href="/details/<%= post['id'] %>">Commets</a>
+			<!-- <a href="/details/<%= post['id'] %>">Commets</a> -->
 
 		</p>
 		<hr/>

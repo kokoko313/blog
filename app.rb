@@ -1,66 +1,42 @@
-#encoding: utf-8
 require 'rubygems'
 require 'sinatra'
 require 'sinatra/reloader'
-require 'sqlite3'
+require 'sinatra/activerecord'
 
-def init_bd
-	@db = SQLite3::Database.new 'lepro.db'
-	@db.results_as_hash = true
+set :database, "sqlite3:lepro.db"
+
+class Post < ActiveRecord::Base
+	validates :username, presence: true, length: { in: 3..12 }
+	validates :content, presence: true
+	validates :created_date, presence: true
 end
 
-
-before do
-	init_bd
-end
-
-configure do
-
-	init_bd
-
-	@db.execute 'CREATE TABLE if not exists Posts
-	(
-		id INTEGER PRIMARY KEY AUTOINCREMENT,
-		created_date DATE,
-		content TEXT
-		)'
-
-	@db.execute 'CREATE TABLE if not exists Comments
-	(
-		id INTEGER PRIMARY KEY AUTOINCREMENT,
-		created_date DATE,
-		content TEXT,
-		post_id INTEGER
-		)'
-
+class Comment < ActiveRecord::Base
+	validates :post_id, presence: true
+	validates :content, presence: true
+	validates :created_date, presence: true
 end
 
 get '/' do
-
-	@results = @db.execute 'select * from Posts order by id desc'
-
+	@posts = Post.order('created_at DESC')
 	erb :index
-
 end
 
 get '/new' do
-  erb :new
+	@p = Post.new
+  	erb :new
 end
 
 post '/new' do
 
-  content = params[:content]
-
-  if content.length <= 0
-  	@error = 'Type post text'
-  	return erb :new
-  end
-
-  # сохранение данных в бд
-
-	@db.execute 'insert into Posts (content,created_date) values (?,datetime())',[content]
-	
-	redirect to '/'
+	@p = Post.new params[:post]
+	@p.created_date = Time.now
+	if @p.save
+		erb "<h2>Спасибо, вы добавили новый пост!</h2>"
+	else
+		@error = @p.errors.full_messages.first
+		erb :new
+	end
 
 end
 
@@ -83,6 +59,11 @@ post '/details/:post_id' do
 	post_id=params[:post_id]
 	content = params[:content]
 
+	if content.length <= 0
+	@error = 'Type comment text'
+    redirect to ('/details/' + post_id)
+  	end
+
 	# сохранение данных в бд
 
 	@db.execute 'insert into Comments 
@@ -94,9 +75,6 @@ post '/details/:post_id' do
 	(?,
 	datetime(),
 	?)', [content,post_id]
-
-
-	#erb "post id #{post_id}  comment #{content}"
 
 	redirect to ('/details/' + post_id)
 
